@@ -1,16 +1,35 @@
-# hsn_v1 (HistoSegNetV1)
+# HistoSegNet (V1)
 
-Code used for the HistoSegNet introduced in Chan *et al.*'s ICCV 2019 submission "HistoSegNet: Semantic Segmentation of Histological Tissue Type in Whole Slide Images". HistoSegNet produces pixel-level predictions of histological tissue type on whole-slide digital pathology images for both morphological and tissue types, using the same histological taxonomy as that introduced by Hosseini *et al.*'s CVPR 2019 paper "Atlas of Digital Pathology: A Generalized Hierarchical Histological Tissue Type-Annotated Database for Deep Learning".
-
+## Introduction
 ![](/img.png)
 
-We have provided the code here for easy installation and verification of the results presented in our paper submission.
+We propose a new approach to Weakly-Supervised Semantic Segmentation (WSSS) with image label supervision for histopathology images, which trains on only patch-level annotations to infer pixel-level labels, called HistoSegNet (published in ICCV 2019). Unlike other approaches, no additional training is required beyond training the classification network and only simple modifications are applied to Grad-CAM to perform segmentation. Our approach involves four stages:
+
+1. Patch-level Classification CNN
+2. Pixel-level Segmentation (i.e. Grad-CAM)
+3. Inter-HTT Adjustments
+4. Segmentation Post-Processing (i.e. dense CRF)
+
+We have provided the code here for easy installation and verification of the results presented in our paper submission. Pretrained models and sample images are provided for the ADP tuning set and the GlaS dataset.
+
+## Citing this repository
+
+If you find this code useful in your research, please consider citing us:
+
+        @InProceedings{chan2019histosegnet,
+          author = {Chan, Lyndon and Hosseini, Mahdi S. and Rowsell, Corwyn and Plataniotis, Konstantinos N. and Damaskinos, Savvas},
+          title = {HistoSegNet: Semantic Segmentation of Histological Tissue Type in Whole Slide Images},
+          booktitle = {The IEEE International Conference on Computer Vision (ICCV)},
+          month = {October},
+          year = {2019}
+        }
+
 
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-### Prerequisites
+## Prerequisites
 
 Mandatory
 
@@ -26,27 +45,15 @@ Mandatory
 Optional
 
 * `matplotlib` (checked on 3.0.2)
+* `jupyter`
 
-### Installing
+## Downloading data
 
-TODO
-```
-cd 
-pip install -r requirements.txt
-pip install .
-```
+Download `hsn_data.zip` (226 MB) from OneDrive containing pretrained models, ground-truth annotations, and images [here](https://drive.google.com/open?id=1jG1ojQKmvGjjjrRhCkaH0FDWM61tSgjL) and extract the contents into your `hsn_v1` directory (i.e. three folders `data`, `gt`, `img`).
 
-### Downloading data
+## Run the demo batch scripts
 
-TODO
-
-### Changing paths
-
-TODO
-
-### Run the demo
-
-To run on the tuning set:
+To run on the ADP tuning set:
 ```
 python demo_01_segment_patches.py
 ```
@@ -56,22 +63,7 @@ To run on the GlaS set:
 python demo_02_segment_glas_patches.py
 ```
 
-To run on scanned WSI set (no overlap, not reported in paper):
-```
-python demo_03_segment_wsi.py
-```
-
-To run on scanned WSI set (with 25% overlap, as reported in paper):
-```
-python demo_03_segment_wsi_overlap.py
-```
-
-To run on the ADP set (not reported in paper):
-```
-python demo_05_segment_adp.py
-```
-
-To train and run Gaudet *et al.*'s segmentation network on the GlaS set:
-```
-python external/Gaudet_SegmentationNet/train.py
-```
+## Run the demo notebooks
+Note: this requires Jupyter notebooks to be set up
+* `demo_01_segment_patches.ipynb`
+* `demo_02_segment_glas_patches.ipynb`

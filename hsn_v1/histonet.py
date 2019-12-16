@@ -7,9 +7,10 @@ import scipy
 from scipy import io
 
 class HistoNet:
+    """Class for implementing the classification CNN stage (HistoNet)"""
+
     def __init__(self, params):
         # Set constant parameters
-        # TODO: extract mean, std dynamically
         self.train_mean = 193.09203
         self.train_std = 56.450138
 
@@ -22,6 +23,8 @@ class HistoNet:
         self.class_names = params['class_names']
 
     def build_model(self):
+        """Load model architecture, weights from file and compile the model"""
+
         # Load architecture from json
         model_json_path = os.path.join(self.model_dir, self.model_name + '.json')
         json_file = open(model_json_path, 'r')
@@ -37,28 +40,66 @@ class HistoNet:
         opt = optimizers.SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
         self.model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['binary_accuracy'])
 
-    # Image normalization (zero-mean, unit-variance)
     def normalize_image(self, X, is_glas=False):
+        """Normalize the input images
+
+        Parameters
+        ----------
+        X : numpy 3D array (size: W x H x 3)
+            The input image, before normalizing
+        is_glas : bool, optional
+            True if segmenting GlaS images, False otherwise
+
+        Returns
+        -------
+        Y : numpy 3D array (size: W x H x 3)
+            The input image, after normalizing
+        """
+
         if is_glas:
-            # X = X - np.expand_dims(np.expand_dims(np.array([5.8604, 5.8955, -0.1963]), axis=0), axis=0)
+            # Clip values between 0 and 255
             X = np.clip(X, 0, 255)
+        # Zero-mean, unit-variance normalization
         Y = (X - self.train_mean) / (self.train_std + 1e-7)
         return Y
 
-    # Load HTT confidence score thresholds
     def load_thresholds(self, thresh_dir, model_name):
+        """Load confidence score thresholds from file
+
+        Parameters
+        ----------
+        thresh_dir : str
+            File path to the directory holding the threshold file
+        model_name : str
+            The name of the model
+        """
+
         thresh_path = os.path.join(thresh_dir, model_name)
         tmp = scipy.io.loadmat(thresh_path)
         self.thresholds = tmp.get('optimalScoreThresh')
 
-    # Obtain HistoNet confidence scores on a set of input images
     def predict(self, input_images, is_glas=False):
+        """Predict classification CNN confidence scores on input images
+
+        Parameters
+        ----------
+        input_images : numpy array (size: self.batch_size x W x H x 3)
+            Input images, single batch
+        is_glas : bool, optional
+            True if segmenting GlaS images, False otherwise
+        Returns
+        -------
+        pass_threshold_image_inds : numpy 1D array (size: num_pass_threshold)
+            The indices of the images
+        pass_threshold_class_inds : numpy 1D array (size: num_pass_threshold)
+            The indices of the predicted classes
+        pass_threshold_scores : numpy 1D array (size: num_pass_threshold)
+            The scores of the predicted classes
+        """
         predicted_scores = self.model.predict(input_images, batch_size=self.batch_size)
         is_pass_threshold = np.greater_equal(predicted_scores, self.thresholds)
         if is_glas:
             exocrine_class_ind = self.class_names.index('G.O')
-            # predicted_scores[:, exocrine_class_ind] = 1 ##
-            # is_pass_threshold = np.greater_equal(predicted_scores, self.thresholds) ##
             is_pass_threshold[:, exocrine_class_ind] = True #
         (pass_threshold_image_inds, pass_threshold_class_inds) = np.where(is_pass_threshold)
         pass_threshold_scores = predicted_scores[is_pass_threshold]
@@ -68,9 +109,31 @@ class HistoNet:
         pass_threshold_class_inds = pass_threshold_class_inds[is_class_in_level3]
         pass_threshold_scores = pass_threshold_scores[is_class_in_level3]
 
-        return pass_threshold_image_inds, pass_threshold_class_inds, pass_threshold_scores, predicted_scores
+        return pass_threshold_image_inds, pass_threshold_class_inds, pass_threshold_scores
 
     def split_by_htt_class(self, pred_image_inds, pred_class_inds, pred_scores, htt_mode, atlas):
+        """Split predicted classes into morphological and functional classes
+
+        Parameters
+        ----------
+        pred_image_inds : numpy 1D array (size: num_pass_threshold)
+            The indices of the images
+        pred_class_inds : numpy 1D array (size: num_pass_threshold)
+            The indices of the predicted classes
+        pred_scores : numpy 1D array (size: num_pass_threshold)
+            The scores of the predicted classes
+        htt_class : str
+            The type of segmentation set to solve
+        atlas : hsn_v1.adp.Atlas object
+            The Atlas of Digital Pathology object
+
+        Returns
+        -------
+        httclass_pred_image_inds :
+        httclass_pred_class_inds :
+        httclass_pred_scores :
+        """
+
         httclass_pred_image_inds = []
         httclass_pred_class_inds = []
         httclass_pred_scores = []
@@ -102,8 +165,8 @@ class HistoNet:
             raise Exception('Error splitting Grad-CAM into HTT-class-specific Grad-CAMs: in and out sizes don\'t match')
         return httclass_pred_image_inds, httclass_pred_class_inds, httclass_pred_scores
 
-    # Find the layer index of the last activation layer before the flatten layer
     def find_final_layer(self):
+        """Find the layer index of the last activation layer before the flatten layer"""
         is_after_flatten = False
         for iter_layer, layer in reversed(list(enumerate(self.model.layers))):
             if type(layer) == keras.layers.core.Flatten:

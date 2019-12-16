@@ -1,0 +1,8 @@
+# PyCharm project
+.idea
+.ipynb_checkpoints
+out
+img
+gt
+data
+tmp

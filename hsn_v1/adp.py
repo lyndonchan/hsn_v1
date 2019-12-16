@@ -1,6 +1,8 @@
 import numpy as np
 
 class Atlas:
+    """Class for defining information related to the Atlas of Digital Pathology"""
+
     def __init__(self):
         self.level1 = ['E', 'C', 'H', 'S', 'A', 'M', 'N', 'G', 'T']
         self.level2 = ['E.M', 'E.T', 'E.P', 'C.D', 'C.L', 'H.E', 'H.K', 'H.Y', 'S.M', 'S.E', 'S.C', 'S.R', 'A.W',
@@ -48,6 +50,7 @@ class Atlas:
         if len(np.unique(self.func_colours, axis=0)) != len(self.func_colours):
             raise Exception('You have duplicate colours for functional HTTs')
 
+        # Remove undifferentiated classes
         morph_valid_class_inds = [i for i, x in enumerate(self.morph_classes) if '.X' not in x]
         func_valid_class_inds = [i for i, x in enumerate(self.func_classes) if '.X' not in x]
         self.morph_valid_classes = [self.morph_classes[i] for i in morph_valid_class_inds]
@@ -57,25 +60,9 @@ class Atlas:
 
         self.level3_valid_inds = [i for i, x in enumerate(self.level5) if np.isin(x,self.level3) and
                                   (np.isin(x, self.morph_valid_classes) or np.isin(x, self.func_valid_classes))]
-        a=1
 
     def convert_class_inds(self, class_inds_in, classes_in, classes_out):
+        """Convert class indices into the classes themselves"""
+
         classes_out = np.array([classes_out.index(classes_in[x]) for x in class_inds_in])
         return classes_out
-
-    def onehot_to_class_inds(self, onehot_x):
-        offset_morph = 1
-        offset_func = 2
-
-        num_morph = len(self.morph_classes) - offset_morph
-        num_func = len(self.func_classes) - offset_func
-
-        cur_gt_morph_inds = onehot_x[:num_morph]
-        cur_gt_func_inds = onehot_x[num_morph:num_morph + num_func]
-        cur_gt_morph_class_inds = [i+offset_morph for i, x in enumerate(cur_gt_morph_inds) if x]
-        cur_gt_func_class_inds = [i+offset_func for i, x in enumerate(cur_gt_func_inds) if x]
-
-        cur_gt_morph_class_inds = [i for i in cur_gt_morph_class_inds if '.X' not in self.morph_classes[i]]
-        cur_gt_func_class_inds = [i for i in cur_gt_func_class_inds if '.X' not in self.func_classes[i]]
-
-        return cur_gt_morph_class_inds, cur_gt_func_class_inds
