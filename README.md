@@ -3,7 +3,7 @@
 ## Introduction
 ![](/img.png)
 
-We propose a new approach to Weakly-Supervised Semantic Segmentation (WSSS) with image label supervision for histopathology images, which trains on only patch-level annotations to infer pixel-level labels, called HistoSegNet (published in ICCV 2019). WSSS is useful for histopathology images because pixel-level prediction of tissue types facilitates further analysis by shape and texture, which can be indicative of disease.
+We propose a new approach to Weakly-Supervised Semantic Segmentation (WSSS) with image label supervision for histopathology images, which trains on only patch-level annotations to infer pixel-level labels, called HistoSegNet (published in [ICCV 2019](http://openaccess.thecvf.com/content_ICCV_2019/html/Chan_HistoSegNet_Semantic_Segmentation_of_Histological_Tissue_Type_in_Whole_Slide_ICCV_2019_paper.html)). WSSS is useful for histopathology images because pixel-level prediction of tissue types facilitates further analysis by shape and texture, which can be indicative of disease.
 
 ![](/method.png)
 
@@ -71,3 +71,11 @@ python demo_02_segment_glas_patches.py
 Note: this requires Jupyter notebooks to be set up
 * `demo_01_segment_patches.ipynb`
 * `demo_02_segment_glas_patches.ipynb`
+
+## Examples
+
+### Patch level
+![](/examples_patch.png)
+
+### Slide level
+![](/examples_slide.png)
