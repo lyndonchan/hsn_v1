@@ -9,7 +9,7 @@ HTT_MODE = 'both'                       # {'both', 'morph', 'func', 'glas'}
 BATCH_SIZE = 16                         # int > 0
 GT_MODE = 'on'                          # {'on', 'off'}
 RUN_LEVEL = 3                           # {1: HTT confidence scores, 2: Grad-CAMs, 3: Segmentation masks}
-SAVE_TYPES = [1, 0, 1, 0]               # {HTT confidence scores, Grad-CAMs, Segmentation masks, Summary images}
+SAVE_TYPES = [1, 1, 1, 1]               # {HTT confidence scores, Grad-CAMs, Segmentation masks, Summary images}
 VERBOSITY = 'NORMAL'                    # {'NORMAL', 'QUIET'}
 DOWNSAMPLE_FACTOR = 1
 

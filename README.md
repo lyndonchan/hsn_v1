@@ -3,7 +3,11 @@
 ## Introduction
 ![](/img.png)
 
-We propose a new approach to Weakly-Supervised Semantic Segmentation (WSSS) with image label supervision for histopathology images, which trains on only patch-level annotations to infer pixel-level labels, called HistoSegNet (published in ICCV 2019). Unlike other approaches, no additional training is required beyond training the classification network and only simple modifications are applied to Grad-CAM to perform segmentation. Our approach involves four stages:
+We propose a new approach to Weakly-Supervised Semantic Segmentation (WSSS) with image label supervision for histopathology images, which trains on only patch-level annotations to infer pixel-level labels, called HistoSegNet (published in ICCV 2019). WSSS is useful for histopathology images because pixel-level prediction of tissue types facilitates further analysis by shape and texture, which can be indicative of disease.
+
+![](/method.png)
+
+Unlike other approaches, no additional training is required beyond training the classification network and only simple modifications are applied to Grad-CAM to perform segmentation. Our approach involves four stages:
 
 1. Patch-level Classification CNN
 2. Pixel-level Segmentation (i.e. Grad-CAM)
